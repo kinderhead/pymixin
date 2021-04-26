@@ -31,4 +31,4 @@ class BulkMixin(Mixin):
 
     def add(self):
         if self.bulk_data != {}:
-            return self.cls.__class__(self.cls.__name__, (self.__class__, self.cls), {})
+            return self.cls.__class__(self.cls.__name__, (self.cls,), self.bulk_data)
