@@ -4,7 +4,7 @@ from .logging import log
 from .patch import patch
 from .bulk import BulkMixin
 
-def init(verbose=True):
+def init(verbose=False):
     logging.islogging = verbose
     log("Initializing mixins")
     patch()

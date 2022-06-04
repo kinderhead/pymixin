@@ -3,14 +3,17 @@ sys.path.append("..")
 import pymixin # noqa
 import textwrap # noqa
 
-pymixin.init()
+pymixin.init(True)
 
-class test(pymixin.BulkMixin):
-    @classmethod
-    def test(cls):
+class test():
+    def test_func(self):
         print("hi")
 
-m = test(pymixin.Mixin)
+@pymixin.Mixin.override(test, "test_func")
+def mixin(self):
+    print("before")
+    _mixin_overridden_func(self)
+    print("after")
 
-pymixin.Mixin = m.add()
-pymixin.Mixin.test()
+obj = test()
+obj.test_func()

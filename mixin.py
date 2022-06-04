@@ -1,4 +1,5 @@
 import functools
+import types
 import inspect
 import textwrap
 
@@ -30,6 +31,7 @@ class Mixin:
     @staticmethod
     def override(cls, name):
         """Override decorator
+        The old function can be accessed through _mixin_overridden_func
 
         Parameters
         ----------
@@ -119,9 +121,10 @@ class Mixin:
             newcode.append("    except Exception as e:\n        raise _MixinError() from e")
         return newcode
 
-    def _finish(self, cls, name, lines, funcname=None):
+    def _finish(self, cls, name, lines, funcname=None, env={}):
         l = {}
         g = getattr(cls, name).__globals__
+        g.update(env)
         g["_MixinError"] = MixinError
         #print("\n".join(lines))
         exec("\n".join(lines), getattr(cls, name).__globals__, l)
@@ -144,7 +147,11 @@ class Mixin:
     
     def _override(self):
         log(f"Overriding function {self._cls.__name__}.{self._name}")
+
+        l = {}
+        exec("\n".join(self._getsource(self._cls, self._name)), getattr(self._cls, self._name).__globals__, l)
+
         newcode = self._parse_func(self._func, True)
-        self._finish(self._cls, self._name, newcode, self._func.__name__)
+        self._finish(self._cls, self._name, newcode, self._func.__name__, {"_mixin_overridden_func": l[self._name]})
 #x = inspect.getsource
 #test().f()
